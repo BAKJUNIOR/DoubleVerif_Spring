@@ -1,6 +1,7 @@
 package com.example.doubleverif_spring.service;
 
 import com.twilio.Twilio;
+import com.twilio.exception.ApiException;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,10 +27,16 @@ public class SmsService {
     }
 
     public void sendSms(String to, String body) {
-        Message.creator(
-                new PhoneNumber(to),
-                new PhoneNumber(fromNumber),
-                body
-        ).create();
+        try {
+            Message.creator(
+                    new PhoneNumber(to),
+                    new PhoneNumber(fromNumber),
+                    body
+            ).create();
+            System.out.println("SMS envoyé avec succès à " + to);
+        } catch (ApiException e) {
+            System.err.println("Erreur lors de l'envoi du SMS : " + e.getMessage());
+            throw new RuntimeException("Erreur lors de l'envoi du SMS", e);
+        }
     }
 }
